@@ -48,150 +48,150 @@ jobs:
         
         # AndroidManifest.xml minimal
         cat > android/app/src/main/AndroidManifest.xml << 'EOF'
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.INTERNET"/>
-    
-    <application
-        android:name="io.flutter.app.FlutterApplication"
-        android:label="Truth AI Verifier"
-        android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="true">
-        
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:theme="@style/LaunchTheme"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize">
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+            <uses-permission android:name="android.permission.INTERNET"/>
             
-            <meta-data
-                android:name="io.flutter.embedding.android.NormalTheme"
-                android:resource="@style/NormalTheme" />
-            
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
-        
-        <meta-data
-            android:name="flutterEmbedding"
-            android:value="2" />
-    </application>
-</manifest>
-EOF
+            <application
+                android:name="io.flutter.app.FlutterApplication"
+                android:label="Truth AI Verifier"
+                android:icon="@mipmap/ic_launcher"
+                android:usesCleartextTraffic="true">
+                
+                <activity
+                    android:name=".MainActivity"
+                    android:exported="true"
+                    android:launchMode="singleTop"
+                    android:theme="@style/LaunchTheme"
+                    android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+                    android:hardwareAccelerated="true"
+                    android:windowSoftInputMode="adjustResize">
+                    
+                    <meta-data
+                        android:name="io.flutter.embedding.android.NormalTheme"
+                        android:resource="@style/NormalTheme" />
+                    
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN"/>
+                        <category android:name="android.intent.category.LAUNCHER"/>
+                    </intent-filter>
+                </activity>
+                
+                <meta-data
+                    android:name="flutterEmbedding"
+                    android:value="2" />
+            </application>
+        </manifest>
+        EOF
 
         # App build.gradle
         cat > android/app/build.gradle << 'EOF'
-def kotlin_version = '1.7.10'
+        def kotlin_version = '1.7.10'
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+        apply plugin: 'com.android.application'
+        apply plugin: 'kotlin-android'
+        apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
-android {
-    namespace "com.truthai.verifier"
-    compileSdkVersion 34
+        android {
+            namespace "com.truthai.verifier"
+            compileSdkVersion 34
 
-    defaultConfig {
-        applicationId "com.truthai.verifier"
-        minSdkVersion 21
-        targetSdkVersion 34
-        versionCode 1
-        versionName "1.0.0"
-    }
+            defaultConfig {
+                applicationId "com.truthai.verifier"
+                minSdkVersion 21
+                targetSdkVersion 34
+                versionCode 1
+                versionName "1.0.0"
+            }
 
-    buildTypes {
-        debug {
-            signingConfig signingConfigs.debug
+            buildTypes {
+                debug {
+                    signingConfig signingConfigs.debug
+                }
+                release {
+                    signingConfig signingConfigs.debug
+                    minifyEnabled true
+                    shrinkResources true
+                    proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+                }
+            }
         }
-        release {
-            signingConfig signingConfigs.debug
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+        flutter {
+            source '../..'
         }
-    }
-}
 
-flutter {
-    source '../..'
-}
-
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-}
-EOF
+        dependencies {
+            implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+        }
+        EOF
 
         # Root build.gradle
         cat > android/build.gradle << 'EOF'
-buildscript {
-    ext.kotlin_version = '1.7.10'
-    repositories {
-        google()
-        mavenCentral()
-    }
+        buildscript {
+            ext.kotlin_version = '1.7.10'
+            repositories {
+                google()
+                mavenCentral()
+            }
 
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
+            dependencies {
+                classpath 'com.android.tools.build:gradle:7.3.0'
+                classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+            }
+        }
 
-def flutterRoot = System.getenv("FLUTTER_ROOT")
+        def flutterRoot = System.getenv("FLUTTER_ROOT")
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+        allprojects {
+            repositories {
+                google()
+                mavenCentral()
+            }
+        }
 
-rootProject.buildDir = '../build'
-subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
-    project.evaluationDependsOn(':app')
-}
+        rootProject.buildDir = '../build'
+        subprojects {
+            project.buildDir = "${rootProject.buildDir}/${project.name}"
+        }
+        subprojects {
+            project.evaluationDependsOn(':app')
+        }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
-EOF
+        task clean(type: Delete) {
+            delete rootProject.buildDir
+        }
+        EOF
 
         # gradle.properties
         cat > android/gradle.properties << 'EOF'
-org.gradle.jvmargs=-Xmx1536M
-android.useAndroidX=true
-android.enableJetifier=true
-EOF
+        org.gradle.jvmargs=-Xmx1536M
+        android.useAndroidX=true
+        android.enableJetifier=true
+        EOF
 
         # gradle-wrapper.properties
         cat > android/gradle/wrapper/gradle-wrapper.properties << 'EOF'
-distributionBase=GRADLE_USER_HOME
-distributionPath=wrapper/dists
-zipStoreBase=GRADLE_USER_HOME
-zipStorePath=wrapper/dists
-distributionUrl=https\://services.gradle.org/distributions/gradle-7.5-all.zip
-EOF
+        distributionBase=GRADLE_USER_HOME
+        distributionPath=wrapper/dists
+        zipStoreBase=GRADLE_USER_HOME
+        zipStorePath=wrapper/dists
+        distributionUrl=https\://services.gradle.org/distributions/gradle-7.5-all.zip
+        EOF
 
         # proguard-rules.pro
         cat > android/app/proguard-rules.pro << 'EOF'
-// Proguard rules for Truth AI
-EOF
+        // Proguard rules for Truth AI
+        EOF
 
         # MainActivity.kt
         cat > android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt << 'EOF'
-package com.truthai.verifier
+        package com.truthai.verifier
 
-import io.flutter.embedding.android.FlutterActivity
+        import io.flutter.embedding.android.FlutterActivity
 
-class MainActivity: FlutterActivity() {
-}
-EOF
+        class MainActivity: FlutterActivity() {
+        }
+        EOF
 
         echo "Essential Android files created"
 
