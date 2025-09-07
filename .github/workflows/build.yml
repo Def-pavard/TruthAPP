@@ -68,14 +68,14 @@ jobs:
         > android/app/src/main/AndroidManifest.xml
         echo "AndroidManifest.xml written"
 
-    - name: Create android/app/build.gradle (no heredoc)
+    - name: Create android/app/build.gradle (fixed escaping)
       run: |
         printf '%s\n' \
         "def kotlin_version = '1.7.10'" \
         "def flutterRoot = System.getenv('FLUTTER_ROOT')" \
         "apply plugin: 'com.android.application'" \
         "apply plugin: 'kotlin-android'" \
-        "apply from: \"${flutterRoot}/packages/flutter_tools/gradle/flutter.gradle\"" \
+        "apply from: \"\\\$flutterRoot/packages/flutter_tools/gradle/flutter.gradle\"" \
         "" \
         "android {" \
         "    namespace \"com.truthai.verifier\"" \
@@ -103,12 +103,12 @@ jobs:
         "flutter { source '../..' }" \
         "" \
         "dependencies {" \
-        "    implementation \"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version\"" \
+        "    implementation \"org.jetbrains.kotlin:kotlin-stdlib-jdk7:\\\$kotlin_version\"" \
         "}" \
         > android/app/build.gradle
         echo "android/app/build.gradle written"
 
-    - name: Create android/build.gradle (no heredoc)
+    - name: Create android/build.gradle (fixed escaping)
       run: |
         printf '%s\n' \
         "buildscript {" \
@@ -116,7 +116,7 @@ jobs:
         "    repositories { google(); mavenCentral() }" \
         "    dependencies {" \
         "        classpath 'com.android.tools.build:gradle:7.3.0'" \
-        "        classpath \"org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version\"" \
+        "        classpath \"org.jetbrains.kotlin:kotlin-gradle-plugin:\\\$kotlin_version\"" \
         "    }" \
         "}" \
         "" \
@@ -125,20 +125,20 @@ jobs:
         "allprojects { repositories { google(); mavenCentral() } }" \
         "" \
         "rootProject.buildDir = '../build'" \
-        "subprojects { project.buildDir = \"${rootProject.buildDir}/${project.name}\" }" \
+        "subprojects { project.buildDir = \"\\\${rootProject.buildDir}/\\\${project.name}\" }" \
         "subprojects { project.evaluationDependsOn(':app') }" \
         "" \
         "task clean(type: Delete) { delete rootProject.buildDir }" \
         > android/build.gradle
         echo "android/build.gradle written"
 
-    - name: Create gradle.properties & wrapper & proguard & MainActivity (no heredoc)
+    - name: Create gradle.properties, wrapper, proguard, MainActivity (no heredoc)
       run: |
         printf '%s\n' 'org.gradle.jvmargs=-Xmx1536M' 'android.useAndroidX=true' 'android.enableJetifier=true' > android/gradle.properties
         printf '%s\n' 'distributionBase=GRADLE_USER_HOME' 'distributionPath=wrapper/dists' 'zipStoreBase=GRADLE_USER_HOME' 'zipStorePath=wrapper/dists' 'distributionUrl=https\://services.gradle.org/distributions/gradle-7.5-all.zip' > android/gradle/wrapper/gradle-wrapper.properties
         printf '%s\n' '// Proguard rules for Truth AI' > android/app/proguard-rules.pro
         printf '%s\n' 'package com.truthai.verifier' '' 'import io.flutter.embedding.android.FlutterActivity' '' 'class MainActivity: FlutterActivity() {}' > android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt
-        echo "Other files written"
+        echo "Other small files written"
 
     - name: Verify Android structure
       run: |
@@ -148,7 +148,7 @@ jobs:
 
     - name: Optional: flutter pub get (fast)
       run: |
-        echo "Running flutter pub get (optional, keep if you want deps fetched)"
+        echo "Running flutter pub get (optional)"
         flutter pub get || echo "flutter pub get failed or had warnings"
 
     - name: Upload regenerated Android project
