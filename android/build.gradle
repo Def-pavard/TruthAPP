@@ -1,18 +1,22 @@
 buildscript {
-    ext.kotlin_version = '1.7.10'
-    repositories { google(); mavenCentral() }
+    // Version Kotlin moderne et compatible
+    ext.kotlin_version = '1.9.22' // Version plus récente et stable
+    
+    repositories {
+        google()
+        mavenCentral()
+    }
+    
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:\$kotlin_version"
+        // Version Gradle plugin compatible
+        classpath 'com.android.tools.build:gradle:8.2.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
-def flutterRoot = System.getenv('FLUTTER_ROOT')
-
-allprojects { repositories { google(); mavenCentral() } }
-
-rootProject.buildDir = '../build'
-subprojects { project.buildDir = "\${rootProject.buildDir}/\${project.name}" }
-subprojects { project.evaluationDependsOn(':app') }
-
-task clean(type: Delete) { delete rootProject.buildDir }
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
