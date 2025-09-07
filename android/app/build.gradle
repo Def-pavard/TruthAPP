@@ -1,32 +1,34 @@
+def kotlin_version = '1.7.10'
+def flutterRoot = System.getenv('FLUTTER_ROOT')
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply from: "\$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
 android {
-    compileSdkVersion 33
+    namespace "com.truthai.verifier"
+    compileSdkVersion 34
 
     defaultConfig {
         applicationId "com.truthai.verifier"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0.0"
     }
 
-    signingConfigs {
-        release {
-            storeFile file('keystore.jks')
-            storePassword System.getenv('KEYSTORE_PASSWORD')
-            keyAlias System.getenv('KEY_ALIAS')
-            keyPassword System.getenv('KEY_PASSWORD')
-        }
-    }
-
     buildTypes {
-        debug {
-            signingConfig signingConfigs.debug
-        }
+        debug { signingConfig signingConfigs.debug }
         release {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+}
+
+flutter { source '../..' }
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:\$kotlin_version"
 }
