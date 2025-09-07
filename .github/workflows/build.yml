@@ -36,7 +36,7 @@ jobs:
         mkdir -p android/gradle/wrapper
         echo "Basic Android directory structure created"
 
-    - name: Create AndroidManifest.xml (no heredoc)
+    - name: Create AndroidManifest.xml
       run: |
         printf '%s\n' \
         '<manifest xmlns:android="http://schemas.android.com/apk/res/android">' \
@@ -68,7 +68,7 @@ jobs:
         > android/app/src/main/AndroidManifest.xml
         echo "AndroidManifest.xml written"
 
-    - name: Create android/app/build.gradle (fixed escaping)
+    - name: Create android/app/build.gradle
       run: |
         printf '%s\n' \
         "def kotlin_version = '1.7.10'" \
@@ -108,7 +108,7 @@ jobs:
         > android/app/build.gradle
         echo "android/app/build.gradle written"
 
-    - name: Create android/build.gradle (fixed escaping)
+    - name: Create android/build.gradle
       run: |
         printf '%s\n' \
         "buildscript {" \
@@ -132,7 +132,7 @@ jobs:
         > android/build.gradle
         echo "android/build.gradle written"
 
-    - name: Create gradle.properties, wrapper, proguard, MainActivity (no heredoc)
+    - name: Create gradle.properties, wrapper, proguard, MainActivity
       run: |
         printf '%s\n' 'org.gradle.jvmargs=-Xmx1536M' 'android.useAndroidX=true' 'android.enableJetifier=true' > android/gradle.properties
         printf '%s\n' 'distributionBase=GRADLE_USER_HOME' 'distributionPath=wrapper/dists' 'zipStoreBase=GRADLE_USER_HOME' 'zipStorePath=wrapper/dists' 'distributionUrl=https\://services.gradle.org/distributions/gradle-7.5-all.zip' > android/gradle/wrapper/gradle-wrapper.properties
