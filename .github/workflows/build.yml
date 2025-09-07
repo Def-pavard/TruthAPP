@@ -12,7 +12,7 @@ env:
 
 jobs:
   setup:
-     runs-on : ubuntu-latest
+      runs-on  : ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,13 +21,13 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{  env.FLUTTER_VERSION  }}
-           cache : true
+            cache  : true
 
       - name: Install dependencies
         run: flutter pub get
 
   analyze:
-     runs-on : ubuntu-latest
+      runs-on  : ubuntu-latest
     needs: setup
     steps:
       - name: Checkout code
@@ -45,6 +45,10 @@ jobs:
   build-android:
       runs-on  : ubuntu-latest
     needs: [setup, analyze]
+    # Add strategy matrix here (this might be what's missing)
+    strategy:
+        matrix  :
+        build-type: [apk, appbundle]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -58,22 +62,19 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Android APK
-        run: flutter build apk --release --no-tree-shake-icons
+      - name: Build Android
+        run: |
+          if [ "${{ matrix.build-type }}" = "apk" ]; then
+            flutter build apk --release --no-tree-shake-icons
+          else
+            flutter build appbundle --release --no-tree-shake-icons
+          fi
 
-      - name: Build Android App Bundle
-        run: flutter build appbundle --release --no-tree-shake-icons
-
-      - name: Upload APK artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: truth-ai-android-apk
-          path: build/app/outputs/flutter-apk/
-          retention-days: 7
-
-      - name: Upload App Bundle artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: truth-ai-android-aab
-          path: build/app/outputs/bundle/
+          name: truth-ai-android-${{  matrix.build-type  }}
+          path: |
+            build/app/outputs/flutter-apk/
+            build/app/outputs/bundle/
           retention-days: 7
