@@ -9,7 +9,7 @@ env:
 jobs:
   regenerate-android:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 14
 
     steps:
     - name: Checkout code
@@ -23,186 +23,133 @@ jobs:
 
     - name: Skip Android licenses
       run: |
-        echo "=== SKIPPING ANDROID LICENSE ACCEPTANCE ==="
+        echo "=== SKIPPING ANDROID LICENSES ==="
         echo "Licenses will be accepted during the actual build if needed"
 
     - name: Create Android structure manually
       run: |
-        echo "=== CREATING ANDROID STRUCTURE MANUALLY ==="
         rm -rf android 2>/dev/null || true
-        mkdir -p android/app/src/main/java
-        mkdir -p android/app/src/main/res
         mkdir -p android/app/src/main/kotlin/com/truthai/verifier
+        mkdir -p android/app/src/main/res
         mkdir -p android/app/src/debug
         mkdir -p android/app/src/profile
         mkdir -p android/gradle/wrapper
         echo "Basic Android directory structure created"
 
-    - name: Create essential Android files
+    - name: Create AndroidManifest.xml (no heredoc)
       run: |
-        echo "=== CREATING ESSENTIAL ANDROID FILES ==="
+        printf '%s\n' \
+        '<manifest xmlns:android="http://schemas.android.com/apk/res/android">' \
+        '    <uses-permission android:name="android.permission.INTERNET"/>' \
+        '    <application' \
+        '        android:name="io.flutter.app.FlutterApplication"' \
+        '        android:label="Truth AI Verifier"' \
+        '        android:icon="@mipmap/ic_launcher"' \
+        '        android:usesCleartextTraffic="true">' \
+        '        <activity' \
+        '            android:name=".MainActivity"' \
+        '            android:exported="true"' \
+        '            android:launchMode="singleTop"' \
+        '            android:theme="@style/LaunchTheme"' \
+        '            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"' \
+        '            android:hardwareAccelerated="true"' \
+        '            android:windowSoftInputMode="adjustResize">' \
+        '            <meta-data' \
+        '                android:name="io.flutter.embedding.android.NormalTheme"' \
+        '                android:resource="@style/NormalTheme" />' \
+        '            <intent-filter>' \
+        '                <action android:name="android.intent.action.MAIN"/>' \
+        '                <category android:name="android.intent.category.LAUNCHER"/>' \
+        '            </intent-filter>' \
+        '        </activity>' \
+        '        <meta-data android:name="flutterEmbedding" android:value="2" />' \
+        '    </application>' \
+        '</manifest>' \
+        > android/app/src/main/AndroidManifest.xml
+        echo "AndroidManifest.xml written"
 
-        # AndroidManifest.xml
-        cat > android/app/src/main/AndroidManifest.xml << 'EOF'
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <application
-        android:name="io.flutter.app.FlutterApplication"
-        android:label="Truth AI Verifier"
-        android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="true">
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:theme="@style/LaunchTheme"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize">
-            <meta-data
-                android:name="io.flutter.embedding.android.NormalTheme"
-                android:resource="@style/NormalTheme" />
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
-        <meta-data
-            android:name="flutterEmbedding"
-            android:value="2" />
-    </application>
-</manifest>
-EOF
+    - name: Create android/app/build.gradle (no heredoc)
+      run: |
+        printf '%s\n' \
+        "def kotlin_version = '1.7.10'" \
+        "def flutterRoot = System.getenv('FLUTTER_ROOT')" \
+        "apply plugin: 'com.android.application'" \
+        "apply plugin: 'kotlin-android'" \
+        "apply from: \"${flutterRoot}/packages/flutter_tools/gradle/flutter.gradle\"" \
+        "" \
+        "android {" \
+        "    namespace \"com.truthai.verifier\"" \
+        "    compileSdkVersion 34" \
+        "" \
+        "    defaultConfig {" \
+        "        applicationId \"com.truthai.verifier\"" \
+        "        minSdkVersion 21" \
+        "        targetSdkVersion 34" \
+        "        versionCode 1" \
+        "        versionName \"1.0.0\"" \
+        "    }" \
+        "" \
+        "    buildTypes {" \
+        "        debug { signingConfig signingConfigs.debug }" \
+        "        release {" \
+        "            signingConfig signingConfigs.debug" \
+        "            minifyEnabled true" \
+        "            shrinkResources true" \
+        "            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'" \
+        "        }" \
+        "    }" \
+        "}" \
+        "" \
+        "flutter { source '../..' }" \
+        "" \
+        "dependencies {" \
+        "    implementation \"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version\"" \
+        "}" \
+        > android/app/build.gradle
+        echo "android/app/build.gradle written"
 
-        # App build.gradle
-        cat > android/app/build.gradle << 'EOF'
-def kotlin_version = '1.7.10'
+    - name: Create android/build.gradle (no heredoc)
+      run: |
+        printf '%s\n' \
+        "buildscript {" \
+        "    ext.kotlin_version = '1.7.10'" \
+        "    repositories { google(); mavenCentral() }" \
+        "    dependencies {" \
+        "        classpath 'com.android.tools.build:gradle:7.3.0'" \
+        "        classpath \"org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version\"" \
+        "    }" \
+        "}" \
+        "" \
+        "def flutterRoot = System.getenv('FLUTTER_ROOT')" \
+        "" \
+        "allprojects { repositories { google(); mavenCentral() } }" \
+        "" \
+        "rootProject.buildDir = '../build'" \
+        "subprojects { project.buildDir = \"${rootProject.buildDir}/${project.name}\" }" \
+        "subprojects { project.evaluationDependsOn(':app') }" \
+        "" \
+        "task clean(type: Delete) { delete rootProject.buildDir }" \
+        > android/build.gradle
+        echo "android/build.gradle written"
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-
-android {
-    namespace "com.truthai.verifier"
-    compileSdkVersion 34
-
-    defaultConfig {
-        applicationId "com.truthai.verifier"
-        minSdkVersion 21
-        targetSdkVersion 34
-        versionCode 1
-        versionName "1.0.0"
-    }
-
-    buildTypes {
-        debug {
-            signingConfig signingConfigs.debug
-        }
-        release {
-            signingConfig signingConfigs.debug
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-}
-
-flutter {
-    source '../..'
-}
-
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-}
-EOF
-
-        # Root build.gradle
-        cat > android/build.gradle << 'EOF'
-buildscript {
-    ext.kotlin_version = '1.7.10'
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
-def flutterRoot = System.getenv("FLUTTER_ROOT")
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-rootProject.buildDir = '../build'
-subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
-    project.evaluationDependsOn(':app')
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
-EOF
-
-        # gradle.properties
-        cat > android/gradle.properties << 'EOF'
-org.gradle.jvmargs=-Xmx1536M
-android.useAndroidX=true
-android.enableJetifier=true
-EOF
-
-        # gradle-wrapper.properties
-        cat > android/gradle/wrapper/gradle-wrapper.properties << 'EOF'
-distributionBase=GRADLE_USER_HOME
-distributionPath=wrapper/dists
-zipStoreBase=GRADLE_USER_HOME
-zipStorePath=wrapper/dists
-distributionUrl=https\://services.gradle.org/distributions/gradle-7.5-all.zip
-EOF
-
-        # proguard-rules.pro
-        cat > android/app/proguard-rules.pro << 'EOF'
-// Proguard rules for Truth AI
-EOF
-
-        # MainActivity.kt
-        cat > android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt << 'EOF'
-package com.truthai.verifier
-
-import io.flutter.embedding.android.FlutterActivity
-
-class MainActivity: FlutterActivity() {
-}
-EOF
-
-        echo "Essential Android files created"
+    - name: Create gradle.properties & wrapper & proguard & MainActivity (no heredoc)
+      run: |
+        printf '%s\n' 'org.gradle.jvmargs=-Xmx1536M' 'android.useAndroidX=true' 'android.enableJetifier=true' > android/gradle.properties
+        printf '%s\n' 'distributionBase=GRADLE_USER_HOME' 'distributionPath=wrapper/dists' 'zipStoreBase=GRADLE_USER_HOME' 'zipStorePath=wrapper/dists' 'distributionUrl=https\://services.gradle.org/distributions/gradle-7.5-all.zip' > android/gradle/wrapper/gradle-wrapper.properties
+        printf '%s\n' '// Proguard rules for Truth AI' > android/app/proguard-rules.pro
+        printf '%s\n' 'package com.truthai.verifier' '' 'import io.flutter.embedding.android.FlutterActivity' '' 'class MainActivity: FlutterActivity() {}' > android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt
+        echo "Other files written"
 
     - name: Verify Android structure
       run: |
-        echo "=== ANDROID STRUCTURE VERIFICATION ==="
-        [ -d "android" ] && echo "Android directory ✅" || echo "Android directory ❌"
-        [ -f "android/app/src/main/AndroidManifest.xml" ] && echo "AndroidManifest ✅" || echo "AndroidManifest ❌"
-        [ -f "android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt" ] && echo "MainActivity ✅" || echo "MainActivity ❌"
+        [ -d "android" ] && echo "Android dir ✅" || (echo "Android dir ❌" && exit 1)
+        [ -f "android/app/src/main/AndroidManifest.xml" ] && echo "Manifest ✅" || (echo "Manifest ❌" && exit 1)
+        [ -f "android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt" ] && echo "MainActivity ✅" || (echo "MainActivity ❌" && exit 1)
 
-    - name: Install dependencies
+    - name: Optional: flutter pub get (fast)
       run: |
-        echo "=== INSTALLING DEPENDENCIES ==="
-        flutter pub get || echo "Dependencies installed with warnings"
-
-    - name: Quick verification
-      run: |
-        echo "=== QUICK VERIFICATION ==="
-        flutter analyze --no-pub || echo "Analysis completed"
-        echo "Basic verification passed"
+        echo "Running flutter pub get (optional, keep if you want deps fetched)"
+        flutter pub get || echo "flutter pub get failed or had warnings"
 
     - name: Upload regenerated Android project
       uses: actions/upload-artifact@v4
@@ -210,16 +157,3 @@ EOF
         name: regenerated-android-project
         path: android/
         retention-days: 1
-
-  status-report:
-    runs-on: ubuntu-latest
-    needs: regenerate-android
-    steps:
-    - name: Report completion
-      run: |
-        echo "=== EMERGENCY FIX COMPLETED ==="
-        echo "Android project structure has been recreated manually"
-        echo "Download the 'regenerated-android-project' artifact"
-        echo "Replace your local android/ folder with the downloaded one"
-        echo "Then run: flutter clean && flutter pub get"
-        echo "Finally test with: flutter build apk --debug"
