@@ -2,79 +2,108 @@ name: Truth AI Build - def-pavard
 
 on:
   push:
-    branches: [main]
+    branches: [ main, master, development ]
   pull_request:
-    branches: [main]
-  workflow_dispatch:
+    branches: [ main, master ]
+  workflow_dispatch:  # Permet de déclencher manuellement
 
 env:
   FLUTTER_VERSION: '3.19.0'
 
 jobs:
-  setup:
+  test:
       runs-on  : ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{  env.FLUTTER_VERSION  }}
-            cache  : true
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{  env.FLUTTER_VERSION  }}
+          cache  : true
 
-      - name: Install dependencies
-        run: flutter pub get
+    - name: Install dependencies
+      run: flutter pub get
 
-  analyze:
-      runs-on  : ubuntu-latest
-    needs: setup
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Run tests
+      run: flutter test
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{  env.FLUTTER_VERSION  }}
-            cache  : true
-
-      - name: Analyze code
-        run: flutter analyze || echo "Analysis completed with warnings"
+    - name: Analyze code
+      run: flutter analyze
 
   build-android:
       runs-on  : ubuntu-latest
-    needs: [setup, analyze]
-    # Add strategy matrix here (this might be what's missing)
-    strategy:
-        matrix  :
-        build-type: [apk, appbundle]
+    needs: test
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{  env.FLUTTER_VERSION  }}
-            cache  : true
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{  env.FLUTTER_VERSION  }}
+          cache  : true
 
-      - name: Install dependencies
-        run: flutter pub get
+    - name: Install dependencies
+      run: flutter pub get
 
-      - name: Build Android
-        run: |
-          if [ "${{ matrix.build-type }}" = "apk" ]; then
-            flutter build apk --release --no-tree-shake-icons
-          else
-            flutter build appbundle --release --no-tree-shake-icons
-          fi
+    - name: Build Android APK
+      run: flutter build apk --release --split-per-abi
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: truth-ai-android-${{  matrix.build-type  }}
-          path: |
-            build/app/outputs/flutter-apk/
-            build/app/outputs/bundle/
-          retention-days: 7
+    - name: Build Android App Bundle
+      run: flutter build appbundle --release
+
+    - name: Upload APK artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: truth-ai-android-apk
+        path: build/app/outputs/flutter-apk/
+        retention-days: 7
+
+    - name: Upload App Bundle artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: truth-ai-android-aab
+        path: build/app/outputs/bundle/
+        retention-days: 7
+
+  build-ios:
+      runs-on  : macos-latest
+    needs Besoins : testtest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{  env.FLUTTER_VERSION  }}
+          cache  : true
+
+    - name: Install CocoaPods dependencies
+      run: |
+        cd ios
+        pod install
+        cd ..
+
+    - name: Build iOS IPA
+      run: flutter build ipa --release --no-codesign
+
+    - name: Upload iOS artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: truth-ai-ios-ipa
+        path: build/ios/ipa/
+        retention-days: 7
+
+  deploy-status:
+      runs-on  : ubuntu-latest
+      needsbesoins   : [build-android, build-ios][build-android, build-ios]
+    if: always()
+    steps:
+    - name: Update README status
+      run: |
+        echo "Build status updated at $(date)" >> status.log
+      continue-on-error: true
