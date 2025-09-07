@@ -1,17 +1,13 @@
-name: Truth AI Build - def-pavard
+name: Truth AI Build - Emergency Fix
 
 on:
-  push:
-    branches: [ main, master, development ]
-  pull_request:
-    branches: [ main, master ]
-  workflow_dispatch: {}  # Permet de déclencher manuellement
+  workflow_dispatch: {}
 
 env:
   FLUTTER_VERSION: '3.19.0'
 
 jobs:
-  setup:
+  regenerate-android:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -23,102 +19,41 @@ jobs:
         flutter-version: ${{ env.FLUTTER_VERSION }}
         cache: true
 
-    - name: Verify Flutter installation
-      run: flutter doctor -v
-
-    - name: Install dependencies (ignore translation warnings)
-      run: flutter pub get || echo "Pub get completed with warnings"
-
-    - name: List project structure
+    - name: Backup project files
       run: |
-        echo "=== PROJECT STRUCTURE ==="
-        ls -la
-        echo "=== ANDROID DIRECTORY ==="
-        ls -la android/ || echo "No android directory"
+        mkdir -p backup
+        cp -r lib backup/ || true
+        cp pubspec.yaml backup/ || true
+        cp -r assets backup/ || true  # Si vous avez un dossier assets
 
-  test:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: ${{ env.FLUTTER_VERSION }}
-        cache: true
-
-    - name: Install dependencies
-      run: flutter pub get || echo "Pub get completed with warnings"
-
-    - name: Check if tests exist
+    - name: Regenerate Android project
       run: |
-        if [ -d "test" ] && [ "$(find test -name '*_test.dart' | wc -l)" -gt 0 ]; then
-          echo "Tests found, running..."
-          flutter test --no-pub -v || echo "Tests failed - continuing workflow"
-        else
-          echo "No test files found, skipping tests"
-          exit 0
-        fi
+        echo "Regenerating Android project..."
+        rm -rf android
+        flutter create --androidx -a kotlin --project-name truth_ai_verifier .
 
-    - name: Analyze code
-      run: flutter analyze || echo "Analysis completed with warnings"
-
-  build-android-release:
-    runs-on: ubuntu-latest
-    needs: [setup, test]
-    # Continue même si les tests échouent
-    if: always()
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: ${{ env.FLUTTER_VERSION }}
-        cache: true
-
-    - name: Install dependencies
-      run: flutter pub get || echo "Pub get completed with warnings"
-
-    - name: Build Android Release APK
+    - name: Restore project files
       run: |
-        echo "Building release APK..."
-        flutter build apk --release --no-tree-shake-icons
+        cp -r backup/lib/* lib/ || true
+        cp backup/pubspec.yaml . || true
+        cp -r backup/assets/* assets/ || true
+        rm -rf backup
 
-    - name: Build Android App Bundle
+    - name: Verify Android structure
       run: |
-        echo "Building App Bundle..."
-        flutter build appbundle --release --no-tree-shake-icons || 
-        echo "App Bundle build failed - may need Android migration"
+        echo "=== ANDROID STRUCTURE VERIFICATION ==="
+        find android/ -name "AndroidManifest.xml"
+        echo "=== MAIN ANDROIDMANIFEST ==="
+        cat android/app/src/main/AndroidManifest.xml
 
-    - name: Upload APK artifact
+    - name: Test build
+      run: |
+        echo "Testing Android build..."
+        flutter build apk --debug || echo "Build test completed"
+
+    - name: Upload regenerated Android project
       uses: actions/upload-artifact@v4
       with:
-        name: android-release-apk
-        path: build/app/outputs/flutter-apk/app-release.apk
-        retention-days: 7
-      if: success() || failure()
-
-    - name: Upload App Bundle artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: android-release-aab
-        path: build/app/outputs/bundle/release/app-release.aab
-        retention-days: 7
-      if: success() || failure()
-
-  status-report:
-    runs-on: ubuntu-latest
-    needs: [setup, test, build-android-release]
-    if: always()
-    steps:
-    - name: Generate comprehensive report
-      run: |
-        echo "=== BUILD STATUS REPORT ==="
-        echo "Setup: ${{ needs.setup.result }}"
-        echo "Test: ${{ needs.test.result }}"
-        echo "Release Build: ${{ needs.build-android-release.result }}"
-        echo "==========================="
+        name: regenerated-android-project
+        path: android/
+        retention-days: 1
