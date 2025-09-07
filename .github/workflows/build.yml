@@ -44,7 +44,7 @@ jobs:
         echo "=== CREATING ESSENTIAL ANDROID FILES ==="
 
         # AndroidManifest.xml minimal
-        cat > android/app/src/main/AndroidManifest.xml << 'EOF'
+        cat > android/app/src/main/AndroidManifest.xml << "EOF"
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
     
@@ -81,11 +81,13 @@ jobs:
 EOF
 
         # App build.gradle
-        cat > android/app/build.gradle << 'EOF'
+        cat > android/app/build.gradle << "EOF"
 def kotlin_version = '1.7.10'
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+
+def flutterRoot = System.getenv("FLUTTER_ROOT")
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
@@ -123,7 +125,7 @@ dependencies {
 EOF
 
         # Root build.gradle
-        cat > android/build.gradle << 'EOF'
+        cat > android/build.gradle << "EOF"
 buildscript {
     ext.kotlin_version = '1.7.10'
     repositories {
@@ -160,14 +162,14 @@ task clean(type: Delete) {
 EOF
 
         # gradle.properties
-        cat > android/gradle.properties << 'EOF'
+        cat > android/gradle.properties << "EOF"
 org.gradle.jvmargs=-Xmx1536M
 android.useAndroidX=true
 android.enableJetifier=true
 EOF
 
         # gradle-wrapper.properties
-        cat > android/gradle/wrapper/gradle-wrapper.properties << 'EOF'
+        cat > android/gradle/wrapper/gradle-wrapper.properties << "EOF"
 distributionBase=GRADLE_USER_HOME
 distributionPath=wrapper/dists
 zipStoreBase=GRADLE_USER_HOME
@@ -176,12 +178,12 @@ distributionUrl=https\://services.gradle.org/distributions/gradle-7.5-all.zip
 EOF
 
         # proguard-rules.pro
-        cat > android/app/proguard-rules.pro << 'EOF'
+        cat > android/app/proguard-rules.pro << "EOF"
 # Proguard rules for Truth AI
 EOF
 
         # MainActivity.kt
-        cat > android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt << 'EOF'
+        cat > android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt << "EOF"
 package com.truthai.verifier
 
 import io.flutter.embedding.android.FlutterActivity
