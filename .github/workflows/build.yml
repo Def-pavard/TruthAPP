@@ -132,7 +132,7 @@ jobs:
         > android/build.gradle
         echo "android/build.gradle written"
 
-    - name: Create gradle.properties, wrapper, proguard, MainActivity
+    - name: Create other Android files
       run: |
         printf '%s\n' 'org.gradle.jvmargs=-Xmx1536M' 'android.useAndroidX=true' 'android.enableJetifier=true' > android/gradle.properties
         printf '%s\n' 'distributionBase=GRADLE_USER_HOME' 'distributionPath=wrapper/dists' 'zipStoreBase=GRADLE_USER_HOME' 'zipStorePath=wrapper/dists' 'distributionUrl=https\://services.gradle.org/distributions/gradle-7.5-all.zip' > android/gradle/wrapper/gradle-wrapper.properties
@@ -146,7 +146,7 @@ jobs:
         [ -f "android/app/src/main/AndroidManifest.xml" ] && echo "Manifest ✅" || (echo "Manifest ❌" && exit 1)
         [ -f "android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt" ] && echo "MainActivity ✅" || (echo "MainActivity ❌" && exit 1)
 
-    - name: Optional: flutter pub get (fast)
+    - name: Optional flutter pub get
       run: |
         echo "Running flutter pub get (optional)"
         flutter pub get || echo "flutter pub get failed or had warnings"
