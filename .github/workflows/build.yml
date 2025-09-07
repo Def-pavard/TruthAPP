@@ -31,16 +31,14 @@ jobs:
       run: |
         echo "=== CREATING ANDROID STRUCTURE MANUALLY ==="
         
-        # Supprimer le dossier android existant s'il est corrompu
         rm -rf android 2>/dev/null || true
         
-        # Créer la structure de dossier de base
         mkdir -p android/app/src/main/java
         mkdir -p android/app/src/main/res
-        mkdir -p android/app/src/main/kotlin
+        mkdir -p android/app/src/main/kotlin/com/truthai/verifier
         mkdir -p android/app/src/debug
         mkdir -p android/app/src/profile
-        mkdir -p android/gradle
+        mkdir -p android/gradle/wrapper
         
         echo "Basic Android directory structure created"
 
@@ -48,13 +46,13 @@ jobs:
       run: |
         echo "=== CREATING ESSENTIAL ANDROID FILES ==="
         
-        # Créer AndroidManifest.xml minimal
+        # AndroidManifest.xml minimal
         cat > android/app/src/main/AndroidManifest.xml << 'EOF'
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
     
     <application
-        android:name="${applicationName}"
+        android:name="io.flutter.app.FlutterApplication"
         android:label="Truth AI Verifier"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
@@ -85,8 +83,10 @@ jobs:
 </manifest>
 EOF
 
-        # Créer build.gradle minimal pour app
+        # App build.gradle
         cat > android/app/build.gradle << 'EOF'
+def kotlin_version = '1.7.10'
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
@@ -125,7 +125,7 @@ dependencies {
 }
 EOF
 
-        # Créer build.gradle racine minimal
+        # Root build.gradle
         cat > android/build.gradle << 'EOF'
 buildscript {
     ext.kotlin_version = '1.7.10'
@@ -139,6 +139,8 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
+
+def flutterRoot = System.getenv("FLUTTER_ROOT")
 
 allprojects {
     repositories {
@@ -160,11 +162,35 @@ task clean(type: Delete) {
 }
 EOF
 
-        # Créer gradle.properties
+        # gradle.properties
         cat > android/gradle.properties << 'EOF'
 org.gradle.jvmargs=-Xmx1536M
 android.useAndroidX=true
 android.enableJetifier=true
+EOF
+
+        # gradle-wrapper.properties
+        cat > android/gradle/wrapper/gradle-wrapper.properties << 'EOF'
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-7.5-all.zip
+EOF
+
+        # proguard-rules.pro
+        cat > android/app/proguard-rules.pro << 'EOF'
+// Proguard rules for Truth AI
+EOF
+
+        # MainActivity.kt
+        cat > android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt << 'EOF'
+package com.truthai.verifier
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity() {
+}
 EOF
 
         echo "Essential Android files created"
@@ -172,18 +198,9 @@ EOF
     - name: Verify Android structure
       run: |
         echo "=== ANDROID STRUCTURE VERIFICATION ==="
-        echo "Android directory:"
         ls -la android/
-        
-        echo "AndroidManifest exists:"
-        if [ -f "android/app/src/main/AndroidManifest.xml" ]; then echo "✅"; else echo "❌"; fi
-        
-        echo "Build.gradle files exist:"
-        if [ -f "android/build.gradle" ]; then echo "✅ Root build.gradle"; else echo "❌ Root build.gradle"; fi
-        if [ -f "android/app/build.gradle" ]; then echo "✅ App build.gradle"; else echo "❌ App build.gradle"; fi
-        
-        echo "Main directory structure:"
         ls -la android/app/src/main/
+        ls -la android/app/src/main/kotlin/com/truthai/verifier/
 
     - name: Install dependencies
       run: |
