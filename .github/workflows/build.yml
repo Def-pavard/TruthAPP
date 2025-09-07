@@ -10,7 +10,7 @@ jobs:
   regenerate-android:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -47,13 +47,11 @@ jobs:
         cat > android/app/src/main/AndroidManifest.xml << 'EOF'
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
-    
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="Truth AI Verifier"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
-        
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -62,17 +60,14 @@ jobs:
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
-            
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
-            
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
