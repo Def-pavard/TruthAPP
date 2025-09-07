@@ -27,7 +27,7 @@
   "verdictMixed": "MIESZANE",
   "verdictMostlyFalse": "W WIĘKSZOŚCI FAŁSZ",
   "verdictFalse": "FAŁSZ",
-  "verdictUnverifiable": "NIEWERYFIKOWALNE"
+  "verdictUnverifiable": "NIEWERYFIKOWALNE",
   "themeSelection": "Wybór motywu",
   "themeDescription": "Wybierz wygląd aplikacji",
   "systemThemeDescription": "Użyj motywu systemowego"
