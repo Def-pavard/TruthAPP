@@ -1,4 +1,4 @@
-name: Truth AI Build
+me: Truth AI Build
 
 on:
   push:
@@ -76,4 +76,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: truth-ai-aab
-          path: build/app/outputs/bundle/release/app-release.aab
+          path
