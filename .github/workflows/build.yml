@@ -1,0 +1,70 @@
+name: Flutter Build
+
+on:
+  push:
+    branches: [ main, development ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Run tests
+      run: flutter test
+
+    - name: Build Android APK
+      run: flutter build apk --release --split-per-abi
+
+    - name: Build Android App Bundle
+      run: flutter build appbundle --release
+
+    - name: Upload APK artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: truth-ai-apk
+        path: build/app/outputs/flutter-apk/
+
+    - name: Upload App Bundle artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: truth-ai-appbundle
+        path: build/app/outputs/bundle/
+
+  build-ios:
+    runs-on: macos-latest
+    needs: build-android
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+
+    - name: Install dependencies
+      run: |
+        flutter pub get
+        cd ios && pod install && cd ..
+
+    - name: Build iOS IPA
+      run: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+
+    - name: Upload IPA artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: truth-ai-ipa
+        path: build/ios/ipa/
