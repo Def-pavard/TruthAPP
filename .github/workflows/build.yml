@@ -9,7 +9,7 @@ env:
 jobs:
   regenerate-android:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     
     steps:
     - name: Checkout code
@@ -24,8 +24,7 @@ jobs:
     - name: Skip Android licenses (timeout workaround)
       run: |
         echo "=== SKIPPING ANDROID LICENSE ACCEPTANCE ==="
-        echo "We'll skip license acceptance to avoid timeout"
-        echo "Licenses will be accepted during the actual build"
+        echo "Licenses will be accepted automatically during Flutter build"
 
     - name: Create Android structure manually
       run: |
@@ -42,18 +41,16 @@ jobs:
     - name: Create essential Android files
       run: |
         echo "=== CREATING ESSENTIAL ANDROID FILES ==="
-
-        # AndroidManifest.xml minimal
-        cat > android/app/src/main/AndroidManifest.xml << "EOF"
+        
+        # AndroidManifest.xml
+        cat > android/app/src/main/AndroidManifest.xml << 'EOF'
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
-    
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="Truth AI Verifier"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
-        
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -62,17 +59,14 @@ jobs:
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
-            
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
-            
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
@@ -81,13 +75,11 @@ jobs:
 EOF
 
         # App build.gradle
-        cat > android/app/build.gradle << "EOF"
+        cat > android/app/build.gradle << 'EOF'
 def kotlin_version = '1.7.10'
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-
-def flutterRoot = System.getenv("FLUTTER_ROOT")
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
@@ -125,14 +117,13 @@ dependencies {
 EOF
 
         # Root build.gradle
-        cat > android/build.gradle << "EOF"
+        cat > android/build.gradle << 'EOF'
 buildscript {
     ext.kotlin_version = '1.7.10'
     repositories {
         google()
         mavenCentral()
     }
-
     dependencies {
         classpath 'com.android.tools.build:gradle:7.3.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -162,14 +153,14 @@ task clean(type: Delete) {
 EOF
 
         # gradle.properties
-        cat > android/gradle.properties << "EOF"
+        cat > android/gradle.properties << 'EOF'
 org.gradle.jvmargs=-Xmx1536M
 android.useAndroidX=true
 android.enableJetifier=true
 EOF
 
         # gradle-wrapper.properties
-        cat > android/gradle/wrapper/gradle-wrapper.properties << "EOF"
+        cat > android/gradle/wrapper/gradle-wrapper.properties << 'EOF'
 distributionBase=GRADLE_USER_HOME
 distributionPath=wrapper/dists
 zipStoreBase=GRADLE_USER_HOME
@@ -178,12 +169,12 @@ distributionUrl=https\://services.gradle.org/distributions/gradle-7.5-all.zip
 EOF
 
         # proguard-rules.pro
-        cat > android/app/proguard-rules.pro << "EOF"
-# Proguard rules for Truth AI
+        cat > android/app/proguard-rules.pro << 'EOF'
+// Proguard rules for Truth AI
 EOF
 
         # MainActivity.kt
-        cat > android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt << "EOF"
+        cat > android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt << 'EOF'
 package com.truthai.verifier
 
 import io.flutter.embedding.android.FlutterActivity
@@ -204,13 +195,16 @@ EOF
     - name: Install dependencies
       run: |
         echo "=== INSTALLING DEPENDENCIES ==="
-        flutter pub get || echo "Dependencies installed with warnings"
+        flutter pub get
 
     - name: Quick verification
       run: |
         echo "=== QUICK VERIFICATION ==="
-        flutter analyze --no-pub || echo "Analysis completed"
-        echo "Basic verification passed"
+        flutter analyze --no-pub
+
+    - name: Build debug APK (forces license acceptance)
+      run: |
+        flutter build apk --debug
 
     - name: Upload regenerated Android project
       uses: actions/upload-artifact@v4
