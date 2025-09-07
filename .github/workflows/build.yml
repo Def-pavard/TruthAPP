@@ -176,11 +176,11 @@ EOF
         ls -la android/
         
         echo "AndroidManifest exists:"
-        [ -f "android/app/src/main/AndroidManifest.xml" ] && echo "✅" || echo "❌"
+        if [ -f "android/app/src/main/AndroidManifest.xml" ]; then echo "✅"; else echo "❌"; fi
         
         echo "Build.gradle files exist:"
-        [ -f "android/build.gradle" ] && echo "✅ Root build.gradle" || echo "❌ Root build.gradle"
-        [ -f "android/app/build.gradle" ] && echo "✅ App build.gradle" || echo "❌ App build.gradle"
+        if [ -f "android/build.gradle" ]; then echo "✅ Root build.gradle"; else echo "❌ Root build.gradle"; fi
+        if [ -f "android/app/build.gradle" ]; then echo "✅ App build.gradle"; else echo "❌ App build.gradle"; fi
         
         echo "Main directory structure:"
         ls -la android/app/src/main/
