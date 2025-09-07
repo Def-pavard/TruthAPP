@@ -30,22 +30,19 @@ jobs:
     - name: Create Android structure manually
       run: |
         echo "=== CREATING ANDROID STRUCTURE MANUALLY ==="
-        
         rm -rf android 2>/dev/null || true
-        
         mkdir -p android/app/src/main/java
         mkdir -p android/app/src/main/res
         mkdir -p android/app/src/main/kotlin/com/truthai/verifier
         mkdir -p android/app/src/debug
         mkdir -p android/app/src/profile
         mkdir -p android/gradle/wrapper
-        
         echo "Basic Android directory structure created"
 
     - name: Create essential Android files
       run: |
         echo "=== CREATING ESSENTIAL ANDROID FILES ==="
-        
+
         # AndroidManifest.xml minimal
         cat > android/app/src/main/AndroidManifest.xml << 'EOF'
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -180,27 +177,7 @@ EOF
 
         # proguard-rules.pro
         cat > android/app/proguard-rules.pro << 'EOF'
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
-
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
-
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Proguard rules for Truth AI
 EOF
 
         # MainActivity.kt
@@ -218,12 +195,9 @@ EOF
     - name: Verify Android structure
       run: |
         echo "=== ANDROID STRUCTURE VERIFICATION ==="
-        echo "Android directory exists:"
-        [ -d "android" ] && echo "✅" || echo "❌"
-        echo "Main AndroidManifest exists:"
-        [ -f "android/app/src/main/AndroidManifest.xml" ] && echo "✅" || echo "❌"
-        echo "MainActivity exists:"
-        [ -f "android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt" ] && echo "✅" || echo "❌"
+        [ -d "android" ] && echo "Android directory ✅" || echo "Android directory ❌"
+        [ -f "android/app/src/main/AndroidManifest.xml" ] && echo "AndroidManifest ✅" || echo "AndroidManifest ❌"
+        [ -f "android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt" ] && echo "MainActivity ✅" || echo "MainActivity ❌"
 
     - name: Install dependencies
       run: |
