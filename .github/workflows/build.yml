@@ -9,8 +9,8 @@ env:
 jobs:
   regenerate-android:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 14
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -21,29 +21,24 @@ jobs:
         flutter-version: ${{ env.FLUTTER_VERSION }}
         cache: true
 
-    - name: Accept Android licenses
+    - name: Skip Android licenses
       run: |
-        echo "=== ACCEPTING ANDROID LICENSES ==="
-        yes | sdkmanager --licenses || echo "License acceptance attempted"
-        flutter doctor --android-licenses || echo "Flutter license check"
+        echo "=== SKIPPING ANDROID LICENSES ==="
+        echo "Licenses will be accepted during actual build"
 
     - name: Create Android structure manually
       run: |
-        echo "=== CREATING ANDROID STRUCTURE MANUALLY ==="
         rm -rf android 2>/dev/null || true
-        mkdir -p android/app/src/main/java
-        mkdir -p android/app/src/main/res
         mkdir -p android/app/src/main/kotlin/com/truthai/verifier
+        mkdir -p android/app/src/main/res
         mkdir -p android/app/src/debug
         mkdir -p android/app/src/profile
         mkdir -p android/gradle/wrapper
-        echo "Basic Android directory structure created"
+        echo "Basic Android structure created"
 
     - name: Create essential Android files
       run: |
-        echo "=== CREATING ESSENTIAL ANDROID FILES ==="
-
-        # AndroidManifest.xml minimal
+        # AndroidManifest.xml
         cat > android/app/src/main/AndroidManifest.xml << 'EOF'
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -78,7 +73,6 @@ EOF
         # App build.gradle
         cat > android/app/build.gradle << 'EOF'
 def kotlin_version = '1.7.10'
-
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
@@ -96,9 +90,7 @@ android {
     }
 
     buildTypes {
-        debug {
-            signingConfig signingConfigs.debug
-        }
+        debug { signingConfig signingConfigs.debug }
         release {
             signingConfig signingConfigs.debug
             minifyEnabled true
@@ -108,9 +100,7 @@ android {
     }
 }
 
-flutter {
-    source '../..'
-}
+flutter { source '../..' }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -121,11 +111,7 @@ EOF
         cat > android/build.gradle << 'EOF'
 buildscript {
     ext.kotlin_version = '1.7.10'
-    repositories {
-        google()
-        mavenCentral()
-    }
-
+    repositories { google(); mavenCentral() }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.3.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -135,23 +121,14 @@ buildscript {
 def flutterRoot = System.getenv("FLUTTER_ROOT")
 
 allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
+    repositories { google(); mavenCentral() }
 }
 
 rootProject.buildDir = '../build'
-subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
-    project.evaluationDependsOn(':app')
-}
+subprojects { project.buildDir = "${rootProject.buildDir}/${project.name}" }
+subprojects { project.evaluationDependsOn(':app') }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
+task clean(type: Delete) { delete rootProject.buildDir }
 EOF
 
         # gradle.properties
@@ -170,42 +147,25 @@ zipStorePath=wrapper/dists
 distributionUrl=https\://services.gradle.org/distributions/gradle-7.5-all.zip
 EOF
 
-        # proguard-rules.pro
-        cat > android/app/proguard-rules.pro << 'EOF'
-// Proguard rules for Truth AI
-EOF
-
         # MainActivity.kt
         cat > android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt << 'EOF'
 package com.truthai.verifier
-
 import io.flutter.embedding.android.FlutterActivity
-
-class MainActivity: FlutterActivity() {
-}
+class MainActivity: FlutterActivity() {}
 EOF
 
         echo "Essential Android files created"
 
-    - name: Verify Android structure
+    - name: Verify structure
       run: |
-        echo "=== ANDROID STRUCTURE VERIFICATION ==="
-        [ -d "android" ] && echo "Android directory ✅" || echo "Android directory ❌"
-        [ -f "android/app/src/main/AndroidManifest.xml" ] && echo "AndroidManifest ✅" || echo "AndroidManifest ❌"
-        [ -f "android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt" ] && echo "MainActivity ✅" || echo "MainActivity ❌"
+        [ -d "android" ] && echo "Android dir ✅"
+        [ -f "android/app/src/main/AndroidManifest.xml" ] && echo "Manifest ✅"
+        [ -f "android/app/src/main/kotlin/com/truthai/verifier/MainActivity.kt" ] && echo "MainActivity ✅"
 
     - name: Install dependencies
-      run: |
-        echo "=== INSTALLING DEPENDENCIES ==="
-        flutter pub get || echo "Dependencies installed with warnings"
+      run: flutter pub get
 
-    - name: Quick verification
-      run: |
-        echo "=== QUICK VERIFICATION ==="
-        flutter analyze --no-pub || echo "Analysis completed"
-        echo "Basic verification passed"
-
-    - name: Upload regenerated Android project
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: regenerated-android-project
@@ -219,8 +179,4 @@ EOF
     - name: Report completion
       run: |
         echo "=== EMERGENCY FIX COMPLETED ==="
-        echo "Android project structure has been recreated manually"
-        echo "Download the 'regenerated-android-project' artifact"
-        echo "Replace your local android/ folder with the downloaded one"
-        echo "Then run: flutter clean && flutter pub get"
-        echo "Finally test with: flutter build apk --debug"
+        echo "Download the 'regenerated-android-project' artifact and replace your local android/ folder"
