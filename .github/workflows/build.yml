@@ -5,14 +5,14 @@ on:
     branches: [ main, master, development ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch:  # Permet de déclencher manuellement
+  workflow_dispatch: {}  # Permet de déclencher manuellement
 
 env:
   FLUTTER_VERSION: '3.19.0'
 
 jobs:
   test:
-      runs-on  : ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -20,8 +20,8 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: ${{  env.FLUTTER_VERSION  }}
-          cache  : true
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        cache: true
 
     - name: Install dependencies
       run: flutter pub get
@@ -33,7 +33,7 @@ jobs:
       run: flutter analyze
 
   build-android:
-      runs-on  : ubuntu-latest
+    runs-on: ubuntu-latest
     needs: test
     steps:
     - name: Checkout code
@@ -42,8 +42,8 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: ${{  env.FLUTTER_VERSION  }}
-          cache  : true
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        cache: true
 
     - name: Install dependencies
       run: flutter pub get
@@ -69,8 +69,8 @@ jobs:
         retention-days: 7
 
   build-ios:
-      runs-on  : macos-latest
-    needs Besoins : testtest
+    runs-on: macos-latest
+    needs: test
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     steps:
     - name: Checkout code
@@ -79,8 +79,8 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: ${{  env.FLUTTER_VERSION  }}
-          cache  : true
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        cache: true
 
     - name: Install CocoaPods dependencies
       run: |
@@ -99,8 +99,8 @@ jobs:
         retention-days: 7
 
   deploy-status:
-      runs-on  : ubuntu-latest
-      needsbesoins   : [build-android, build-ios][build-android, build-ios]
+    runs-on: ubuntu-latest
+    needs: [build-android, build-ios]
     if: always()
     steps:
     - name: Update README status
