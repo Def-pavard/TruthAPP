@@ -27,7 +27,7 @@
   "verdictMixed": "MIXED",
   "verdictMostlyFalse": "MOSTLY FALSE",
   "verdictFalse": "FALSE",
-  "verdictUnverifiable": "UNVERIFIABLE"
+  "verdictUnverifiable": "UNVERIFIABLE",
   "themeSelection": "Theme Selection",
   "themeDescription": "Choose the appearance of the application",
   "systemThemeDescription": "Use system theme"
