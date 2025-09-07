@@ -21,35 +21,64 @@ jobs:
 
     - name: Backup project files
       run: |
+        echo "=== BACKING UP PROJECT FILES ==="
         mkdir -p backup
-        cp -r lib backup/ || true
-        cp pubspec.yaml backup/ || true
-        cp -r assets backup/ || true  # Si vous avez un dossier assets
+        # Sauvegarder tous les fichiers importants
+        cp -r lib backup/ 2>/dev/null || echo "lib directory not found"
+        cp pubspec.yaml backup/ 2>/dev/null || echo "pubspec.yaml not found"
+        cp -r assets backup/ 2>/dev/null || echo "assets directory not found"
+        cp -r test backup/ 2>/dev/null || echo "test directory not found"
+        cp -r web backup/ 2>/dev/null || echo "web directory not found"
+        cp -r linux backup/ 2>/dev/null || echo "linux directory not found"
+        cp -r windows backup/ 2>/dev/null || echo "windows directory not found"
+        cp -r macos backup/ 2>/dev/null || echo "macos directory not found"
+        echo "Backup completed"
 
     - name: Regenerate Android project
       run: |
-        echo "Regenerating Android project..."
+        echo "=== REGENERATING ANDROID PROJECT ==="
         rm -rf android
         flutter create --androidx -a kotlin --project-name truth_ai_verifier .
+        echo "Android project regenerated successfully"
 
     - name: Restore project files
       run: |
-        cp -r backup/lib/* lib/ || true
-        cp backup/pubspec.yaml . || true
-        cp -r backup/assets/* assets/ || true
+        echo "=== RESTORING PROJECT FILES ==="
+        cp -r backup/lib/* lib/ 2>/dev/null || echo "No lib to restore"
+        cp backup/pubspec.yaml . 2>/dev/null || echo "No pubspec to restore"
+        cp -r backup/assets/* assets/ 2>/dev/null || echo "No assets to restore"
+        cp -r backup/test/* test/ 2>/dev/null || echo "No tests to restore"
         rm -rf backup
+        echo "Project files restored"
 
     - name: Verify Android structure
       run: |
         echo "=== ANDROID STRUCTURE VERIFICATION ==="
+        echo "AndroidManifest files:"
         find android/ -name "AndroidManifest.xml"
-        echo "=== MAIN ANDROIDMANIFEST ==="
+        echo ""
+        echo "Main AndroidManifest content:"
         cat android/app/src/main/AndroidManifest.xml
+        echo ""
+        echo "Android directory structure:"
+        ls -la android/app/src/main/
 
-    - name: Test build
+    - name: Install dependencies
       run: |
-        echo "Testing Android build..."
-        flutter build apk --debug || echo "Build test completed"
+        echo "=== INSTALLING DEPENDENCIES ==="
+        flutter pub get || echo "Dependencies installed with warnings"
+
+    - name: Test Android build
+      run: |
+        echo "=== TESTING ANDROID BUILD ==="
+        flutter build apk --debug --no-tree-shake-icons
+        echo "Build test completed successfully"
+
+    - name: Verify build outputs
+      run: |
+        echo "=== BUILD OUTPUTS ==="
+        find build/ -name "*.apk" || echo "No APK files found"
+        ls -la build/app/outputs/ || echo "No outputs directory"
 
     - name: Upload regenerated Android project
       uses: actions/upload-artifact@v4
@@ -57,3 +86,23 @@ jobs:
         name: regenerated-android-project
         path: android/
         retention-days: 1
+
+    - name: Upload debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: debug-apk-verification
+        path: build/app/outputs/flutter-apk/app-debug.apk
+        retention-days: 1
+      if: success()
+
+  status-report:
+    runs-on: ubuntu-latest
+    needs: regenerate-android
+    steps:
+    - name: Report completion
+      run: |
+        echo "=== EMERGENCY FIX COMPLETED ==="
+        echo "Android project has been regenerated"
+        echo "Download the 'regenerated-android-project' artifact"
+        echo "Replace your local android/ folder with the downloaded one"
+        echo "Then run your normal build workflow"
