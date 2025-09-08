@@ -1,56 +1,51 @@
-// Ligne 1-2 CORRIGÉE : Utiliser '=' au lieu de 'def' pour la déclaration
-ext.kotlin_version = '1.9.22'
-def flutterRoot = System.getenv('FLUTTER_ROOT')
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+}
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+android {
+    namespace "com.truthai.verifier"
+    compileSdkVersion 33
 
+    defaultConfig {
+        applicationId "com.truthai.verifier"
+        minSdkVersion 21
+        targetSdkVersion 33
+        versionCode 1
+        versionName "1.0.0"
 
-
-    // OPTIONS DE COMPILATION AJOUTÉES
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
+        multiDexEnabled true
     }
 
     buildTypes {
-        debug { 
-            signingConfig signingConfigs.debug 
+        debug {
+            signingConfig signingConfigs.debug
         }
         release {
+            // Comme tu n’as pas encore de keystore, on utilise la clé de debug
             signingConfig signingConfigs.debug
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-}
 
-flutter { 
-    source '../..' 
-}
-
-
-android {
-    compileSdkVersion 34
-    // ... reste inchangé ...
-    
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17 // Mise à jour Java
+        sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '17' // Mise à jour JVM target
+        jvmTarget = "17"
     }
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version" // jdk8 au lieu de jdk7
-    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "androidx.core:core-ktx:1.12.0"
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation "com.google.android.material:material:1.9.0"
+    implementation "androidx.constraintlayout:constraintlayout:2.1.4"
+
+    // Flutter dépendances (incluses automatiquement par Flutter)
 }
