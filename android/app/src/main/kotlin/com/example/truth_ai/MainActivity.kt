@@ -1,6 +1,6 @@
-package com.example.truthapp
+package com.thruthai.truthapp; // Mets ici ton vrai package
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterActivity;
 
-class MainActivity: FlutterActivity() {
+public class MainActivity extends FlutterActivity {
 }
