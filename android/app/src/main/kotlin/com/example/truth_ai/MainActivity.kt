@@ -1,5 +1,6 @@
-package com.example.truth_ai
+package com.example.truthapp
 
 import io.flutter.embedding.android.FlutterActivity
 
-class MainActivity : FlutterActivity()
+class MainActivity: FlutterActivity() {
+}
