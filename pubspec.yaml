@@ -20,6 +20,7 @@ dependencies:
   url_launcher: ^6.1.10
   google_fonts: ^4.0.4
   shared_preferences: ^2.2.2
+  some_package: ^2.0.0
 
 dev_dependencies:
   flutter_test:
