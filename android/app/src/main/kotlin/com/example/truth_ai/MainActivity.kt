@@ -1,9 +1,8 @@
-<!--package com.thruthai.truthapp; // Mets ici ton vrai package
+#package com.thruthai.truthapp; // Mets ici ton vrai package
 
-import io.flutter.embedding.android.FlutterActivity;
+#import io.flutter.embedding.android.FlutterActivity;
 
-public class MainActivity extends FlutterActivity {
-}-->
+#public class MainActivity extends FlutterActivity
 
   package com.thruthai.truthapp
 
