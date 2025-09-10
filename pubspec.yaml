@@ -21,6 +21,10 @@ dependencies:
   google_fonts: ^4.0.4
   shared_preferences: ^2.2.2
   some_package: ^2.0.0
+  flutter_local_notifications: ^13.0.0
+  permission_handler: ^10.4.0
+  device_info_plus: ^8.1.0
+  # pour produire/recevoir messages natifs
 
 dev_dependencies:
   flutter_test:
