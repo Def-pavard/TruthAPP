@@ -30,5 +30,9 @@
   "verdictUnverifiable": "НЕПРОВЕРЯЕМО",
   "themeSelection": "Выбор темы",
   "themeDescription": "Выберите внешний вид приложения",
-  "systemThemeDescription": "Использовать системную тему"
+  "systemThemeDescription": "Использовать системную тему",
+  "deepfakeAlertTitle": "Предупреждение о дипфейке",
+  "deepfakeAlertMessage": "Дипфейк: не верьте непроверенной информации.",
+  "enableSocialVigil": "Включить Социального Наблюдателя",
+  "socialVigilDescription": "При активации Truth AI будет незаметно напоминать вам при использовании выбранных социальных сетей."
 }
