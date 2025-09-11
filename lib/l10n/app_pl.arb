@@ -30,5 +30,9 @@
   "verdictUnverifiable": "NIEWERYFIKOWALNE",
   "themeSelection": "Wybór motywu",
   "themeDescription": "Wybierz wygląd aplikacji",
-  "systemThemeDescription": "Użyj motywu systemowego"
+  "systemThemeDescription": "Użyj motywu systemowego",
+  "deepfakeAlertTitle": "Ostrzeżenie o deepfake",
+  "deepfakeAlertMessage": "Deepfake: nie wierz w niesprawdzone informacje.",
+  "enableSocialVigil": "Włącz Społeczną Czujność",
+  "socialVigilDescription": "Po włączeniu Truth AI będzie dyskretnie przypominać ci podczas korzystania z wybranych mediów społecznościowych."
 }
