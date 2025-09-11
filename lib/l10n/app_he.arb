@@ -30,5 +30,9 @@
   "verdictUnverifiable": "לא ניתן לאימות",
   "themeSelection": "בחירת ערכת נושא",
   "themeDescription": "בחר את המראה של היישום",
-  "systemThemeDescription": "השתמש בערכת הנושא של המערכת"
+  "systemThemeDescription": "השתמש בערכת הנושא של המערכת",
+  "deepfakeAlertTitle": "התראת דיפפייק",
+  "deepfakeAlertMessage": "דיפפייק: אל תאמינו למידע לא מאומת.",
+  "enableSocialVigil": "הפעל שמירת רשתות חברתיות",
+  "socialVigilDescription": "כאשר מופעלת, Truth AI מזכירה לך בעדינות בעת שימוש ברשתות החברתיות שנבחרו."
 }
