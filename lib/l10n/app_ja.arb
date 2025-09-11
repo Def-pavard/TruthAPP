@@ -30,5 +30,9 @@
   "verdictUnverifiable": "検証不能",
   "themeSelection": "テーマ選択",
   "themeDescription": "アプリの外観を選択",
-  "systemThemeDescription": "システムテーマを使用"
+  "systemThemeDescription": "システムテーマを使用",
+  "deepfakeAlertTitle": "ディープフェイク警告",
+  "deepfakeAlertMessage": "ディープフェイク：未確認の情報を信じないでください。",
+  "enableSocialVigil": "ソーシャル監視を有効化",
+  "socialVigilDescription": "有効にすると、Truth AI は選択したソーシャルメディアを使用する際にさりげなく注意を促します。"
 }
