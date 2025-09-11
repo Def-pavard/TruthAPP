@@ -30,5 +30,9 @@
   "verdictUnverifiable": "غير قابل للتحقق",
   "themeSelection": "اختيار السمة",
   "themeDescription": "اختر مظهر التطبيق",
-  "systemThemeDescription": "استخدام سمة النظام"
+  "systemThemeDescription": "استخدام سمة النظام",
+  "deepfakeAlertTitle": "تنبيه المحتوى المزيف",
+  "deepfakeAlertMessage": "المحتوى المزيف: لا تصدق المعلومات غير المؤكدة.",
+  "enableSocialVigil": "تفعيل المراقبة الاجتماعية",
+  "socialVigilDescription": "عند التفعيل، يقوم Truth AI بتذكيرك بشكل غير ملحوظ أثناء استخدام شبكات التواصل الاجتماعي المحددة."
 }
