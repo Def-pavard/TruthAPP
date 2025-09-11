@@ -30,5 +30,9 @@
   "verdictUnverifiable": "unverifiable",
   "themeSelection": "Theme selection",
   "themeDescription": "Choose the appearance of the application",
-  "systemThemeDescription": "Use system theme"
+  "systemThemeDescription": "Use system theme",
+  "deepfakeAlertTitle": "Deepfake Alert",
+  "deepfakeAlertMessage": "Deepfake: do not believe unverified information.",
+  "enableSocialVigil": "Enable Social Vigil",
+  "socialVigilDescription": "When enabled, Truth AI discreetly reminds you while using the selected social networks."
 }
