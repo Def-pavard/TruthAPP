@@ -30,5 +30,9 @@
   "verdictUnverifiable": "无法验证",
   "themeSelection": "主题选择",
   "themeDescription": "选择应用程序的外观",
-  "systemThemeDescription": "使用系统主题"
+  "systemThemeDescription": "使用系统主题",
+  "deepfakeAlertTitle": "深度伪造警告",
+  "deepfakeAlertMessage": "深度伪造：不要相信未经验证的信息。",
+  "enableSocialVigil": "启用社交守护",
+  "socialVigilDescription": "启用后，Truth AI 会在您使用所选社交媒体时悄悄提醒您。"
 }
