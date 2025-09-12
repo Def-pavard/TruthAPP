@@ -1,0 +1,4 @@
+<resources>
+    <string name="deepfake_alert_title">深度伪造警告</string>
+    <string name="deepfake_alert_message">深度伪造：不要相信未经验证的信息。</string>
+</resources>
