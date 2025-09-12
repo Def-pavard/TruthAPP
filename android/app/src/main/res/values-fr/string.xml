@@ -1,0 +1,4 @@
+<resources>
+    <string name="deepfake_alert_title">Alerte Deepfake</string>
+    <string name="deepfake_alert_message">Deepfake : ne croyez pas aux informations non vérifiées.</string>
+</resources>
