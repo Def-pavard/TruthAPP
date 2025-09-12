@@ -1,0 +1,187 @@
+package com.thruthai.monitor
+
+import android.app.*
+import android.content.Context
+import android.content.Intent
+import android.app.usage.UsageStatsManager
+import android.app.usage.UsageEvents
+import android.os.Build
+import android.os.IBinder
+import android.provider.Settings
+import android.view.*
+import android.widget.TextView
+import android.graphics.PixelFormat
+import androidx.core.app.NotificationCompat
+import java.util.*
+import kotlin.concurrent.timer
+
+class AppUsageMonitorService : Service() {
+
+  companion object {
+    var isRunning = false
+  }
+
+  private val CHANNEL_ID = "truth_ai_monitor_channel"
+  private var overlayView: View? = null
+  private var windowManager: WindowManager? = null
+  private var reminderTimer: Timer? = null
+  private val targetPackages = listOf("com.facebook.katana","com.instagram.android","com.twitter.android")
+
+  override fun onCreate() {
+    super.onCreate()
+    isRunning = true
+    createNotificationChannel()
+    startForeground(1001, buildNotification("Monitoring social apps"))
+    windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+    startMonitoringLoop()
+  }
+
+  override fun onDestroy() {
+    stopMonitoringLoop()
+    removeOverlay()
+    isRunning = false
+    super.onDestroy()
+  }
+
+  override fun onBind(intent: Intent?): IBinder? = null
+
+  private fun createNotificationChannel() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      val channel = NotificationChannel(CHANNEL_ID, "Truth AI Monitor", NotificationManager.IMPORTANCE_LOW)
+      val nm = getSystemService(NotificationManager::class.java)
+      nm.createNotificationChannel(channel)
+    }
+  }
+
+  private fun buildNotification(text: String): Notification {
+    val openIntent = Intent(this, MainActivity::class.java)
+    val p = PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_IMMUTABLE)
+    return NotificationCompat.Builder(this, CHANNEL_ID)
+      .setContentTitle("Truth AI")
+      .setContentText(text)
+      .setSmallIcon(R.drawable.ic_notification) // provide
+      .setContentIntent(p)
+      .setPriority(NotificationCompat.PRIORITY_LOW)
+      .build()
+  }
+
+  private fun startMonitoringLoop() {
+    // Poll every 4 seconds for foreground app (UsageEvents)
+    timer(period = 4000) {
+      val fg = getForegroundAppPackage()
+      if (fg != null && targetPackages.any { fg.contains(it) }) {
+        // show overlay if not shown
+        if (overlayView == null) addOverlay()
+        // schedule 3h reminders (only once per detection session)
+        scheduleReminders()
+      } else {
+        // remove overlay if present
+        removeOverlay()
+        cancelReminders()
+      }
+    }
+  }
+
+  private fun stopMonitoringLoop() {
+    reminderTimer?.cancel()
+    reminderTimer = null
+    // timer() started in startMonitoringLoop is anonymous; we rely on service stop to cancel all threads
+  }
+
+  private fun getForegroundAppPackage(): String? {
+    try {
+      val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+      val now = System.currentTimeMillis()
+      // Query events in last 10s
+      val events = usageStatsManager.queryEvents(now - 10000, now)
+      var event = UsageEvents.Event()
+      var lastPackage: String? = null
+      while (events.hasNextEvent()) {
+        events.getNextEvent(event)
+        if (event.eventType == UsageEvents.Event.MOVE_TO_FOREGROUND) {
+          lastPackage = event.packageName
+        }
+      }
+      return lastPackage
+    } catch (e: Exception) {
+      return null
+    }
+  }
+
+  private fun addOverlay() {
+    // Check overlay permission
+    if (!Settings.canDrawOverlays(this)) {
+      // Intent to ask for permission
+      val i = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, android.net.Uri.parse("package:$packageName"))
+      i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      startActivity(i)
+      return
+    }
+    if (overlayView != null) return
+
+    val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    overlayView = inflater.inflate(R.layout.overlay_layout, null)
+
+    val layoutParams = WindowManager.LayoutParams(
+      WindowManager.LayoutParams.WRAP_CONTENT,
+      WindowManager.LayoutParams.WRAP_CONTENT,
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY else WindowManager.LayoutParams.TYPE_PHONE,
+      WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+      PixelFormat.TRANSLUCENT
+    )
+    layoutParams.gravity = Gravity.TOP or Gravity.START
+    layoutParams.x = 20
+    layoutParams.y = 200
+
+    // Button action open app
+    overlayView?.findViewById<TextView>(R.id.overlay_text)?.setOnClickListener {
+      val i = packageManager.getLaunchIntentForPackage(packageName)
+      if (i != null) {
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(i)
+      }
+    }
+
+    windowManager?.addView(overlayView, layoutParams)
+  }
+
+  private fun removeOverlay() {
+    try {
+      if (overlayView != null) {
+        windowManager?.removeView(overlayView)
+        overlayView = null
+      }
+    } catch (e: Exception) { }
+  }
+
+  private fun scheduleReminders() {
+    if (reminderTimer != null) return
+    // schedule a task every 3 hours
+    reminderTimer = Timer()
+    reminderTimer?.schedule(object : TimerTask() {
+      override fun run() {
+        sendReminderNotification()
+      }
+    }, 3 * 60 * 60 * 1000L, 3 * 60 * 60 * 1000L)
+  }
+
+  private fun cancelReminders() {
+    reminderTimer?.cancel()
+    reminderTimer = null
+  }
+private fun sendReminderNotification() {
+    val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val intent = packageManager.getLaunchIntentForPackage(packageName)
+    val p = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+    val notif = NotificationCompat.Builder(this, CHANNEL_ID)
+        .setSmallIcon(R.drawable.ic_notification)
+        .setContentTitle(getString(R.string.deepfake_alert_title))
+        .setContentText(getString(R.string.deepfake_alert_message))
+        .setContentIntent(p)
+        .setAutoCancel(true)
+        .build()
+
+    nm.notify((System.currentTimeMillis() % 10000).toInt(), notif)
+}
+}
