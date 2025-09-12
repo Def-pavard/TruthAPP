@@ -1,0 +1,4 @@
+<resources>
+    <string name="deepfake_alert_title">התראת דיפ פייק</string>
+    <string name="deepfake_alert_message">דיפ פייק: אל תאמינו למידע לא מאומת.</string>
+</resources>
