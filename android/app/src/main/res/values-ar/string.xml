@@ -1,0 +1,4 @@
+<resources>
+    <string name="deepfake_alert_title">تنبيه ديب فيك</string>
+    <string name="deepfake_alert_message">ديب فيك: لا تصدق المعلومات غير المؤكدة.</string>
+</resources>
