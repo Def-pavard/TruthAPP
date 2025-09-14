@@ -41,13 +41,12 @@ flutter:
     - assets/images/ForensicsModeApp.png
     - assets/images/ImageDailyApp.png
     - assets/shaders/aurora_shader.frag
-
   
-    -
-      family: Montserrat
-        -
-          asset: assets/fonts/Montserrat-Regular.ttf
-        -
-          asset: assets/fonts/Montserrat-Bold.ttf
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat-Regular.ttf
+        - asset: assets/fonts/Montserrat-Bold.ttf
 
+  shaders:
     - assets/shaders/aurora_shader.frag
