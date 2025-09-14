@@ -1,0 +1,28 @@
+name: truth_ai
+
+version: 1.0.0+1
+
+
+dependencies:
+  flutter:
+  font_awesome_flutter: ^10.5.0
+  # pour produire/recevoir messages natifs
+
+dev_dependencies:
+
+
+flutter:
+  uses-material-design: true
+    - assets/images/
+    - assets/images/ForensicsModeApp.png
+    - assets/images/ImageDailyApp.png
+    - assets/shaders/aurora_shader.frag
+  
+    -
+      family: Montserrat
+        -
+          asset: assets/fonts/Montserrat-Regular.ttf
+        -
+          asset: assets/fonts/Montserrat-Bold.ttf
+
+    - assets/shaders/aurora_shader.frag
