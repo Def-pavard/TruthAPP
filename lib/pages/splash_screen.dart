@@ -73,7 +73,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     ),
             ),
           ),
-          // Texte "Truth AI" en bas, centré
+          // Texte "Thruth AI" en bas, centré
           Positioned(
             bottom: 20,
             left: 0,
