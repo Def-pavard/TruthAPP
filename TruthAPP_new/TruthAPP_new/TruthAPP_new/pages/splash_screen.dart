@@ -67,7 +67,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       height: 150,
                     )
                   : Image.asset(
-                      'assets/Bubbleplash.png', // Logo statique pour mode jour
+                      'assets/Bubblesplash.png', // Logo statique pour mode jour
                       width: 150,
                       height: 150,
                     ),
@@ -79,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             left: 0,
             right: 0,
             child: Text(
-              'Truth AI',
+              'Thruth AI',
               textAlign: TextAlign.center,
               style: GoogleFonts.montserrat(
                 fontSize: 18,
