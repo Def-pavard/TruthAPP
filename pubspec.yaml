@@ -39,6 +39,8 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
+    - assets/Bubblesplash.png
+    - assets/animation_nuit.gif
     - assets/images/
     - assets/images/ForensicsModeApp.png
     - assets/images/ImageDailyApp.png
