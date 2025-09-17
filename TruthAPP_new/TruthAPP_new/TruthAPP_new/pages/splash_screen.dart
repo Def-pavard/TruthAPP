@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import 'package:truth_ai/providers/theme_provider.dart';
 import 'package:truth_ai/pages/home_page.dart';
-import 'package:video_player/video_player.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,18 +12,15 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
-  VideoPlayerController? _videoController;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialiser le thème provider pour détecter le mode système
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    themeProvider.updateFromSystem();
-
+    // Initialiser l'animation de transition
+    final isDarkMode = MediaQuery.of(context).platformBrightness == Brightness.dark;
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: isDarkMode ? const Duration(milliseconds: 7000) : const Duration(milliseconds: 1500), // 7s pour mode nuit, 1.5s pour mode jour
       vsync: this,
     );
 
@@ -35,21 +29,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       curve: Curves.easeInOut,
     );
 
-    // Initialiser le contrôleur vidéo pour mode nuit
-    if (themeProvider.isDarkMode) {
-      _videoController = VideoPlayerController.asset('assets/animation_nuit.mp4')
-        ..initialize().then((_) {
-          setState(() {});
-          _videoController!.play();
-          _videoController!.setLooping(true);
-        });
-    }
-
     _controller.forward();
 
+    // Passer à la page suivante après la fin de l'animation
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        _videoController?.dispose();
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const HomePage()),
         );
@@ -60,55 +44,51 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   void dispose() {
     _controller.dispose();
-    _videoController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    // Déterminer le mode jour/nuit à partir du système
+    final isDarkMode = MediaQuery.of(context).platformBrightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? Colors.black : Colors.white, // Blanc absolu pour mode jour
-      body: Center(
-        child: FadeTransition(
-          opacity: _animation,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo Bubbleplash
-              Image.asset(
-                'assets/Bubblesplash.png',
-                width: 150,
-                height: 150,
-              ),
-              const SizedBox(height: 24),
-              // Animation ou image selon le mode
-              isDarkMode
-                  ? (_videoController != null && _videoController!.value.isInitialized
-                      ? SizedBox(
-                          width: 300,
-                          height: 200,
-                          child: VideoPlayer(_videoController!),
-                        )
-                      : const CircularProgressIndicator())
+      backgroundColor: isDarkMode ? Colors.black : Colors.white, // Blanc absolu pour mode jour, noir pour mode nuit
+      body: Stack(
+        children: [
+          // Contenu centré (logo ou animation)
+          Center(
+            child: FadeTransition(
+              opacity: _animation,
+              child: isDarkMode
+                  ? Image.asset(
+                      'assets/animation_nuit.gif', // GIF pour mode nuit
+                      width: 150,
+                      height: 150,
+                    )
                   : Image.asset(
-                      'assets/Splashanim.png', // Image pour mode jour
-                      width: 300,
-                      height: 200,
+                      'assets/Bubbleplash.png', // Logo statique pour mode jour
+                      width: 150,
+                      height: 150,
                     ),
-              const SizedBox(height: 16),
-              Text(
-                isDarkMode ? 'Mode Nuit Activé' : 'Mode Jour Activé',
-                style: TextStyle(
-                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                  fontSize: 14,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+          // Texte "Truth AI" en bas, centré
+          Positioned(
+            bottom: 20,
+            left: 0,
+            right: 0,
+            child: Text(
+              'Truth AI',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
