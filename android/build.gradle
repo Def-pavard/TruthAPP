@@ -1,11 +1,11 @@
-// Top-level build.gradle
+// build.gradle.kts (niveau projet)
 buildscript {
     repositories {
-        google() // Repository pour les artefacts Android
-        mavenCentral() // Repository Maven central
+        google() // Dépôt pour les artefacts Android
+        mavenCentral() // Dépôt Maven central
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:9.0.0' // Version récente compatible avec 2025
+        classpath("com.android.tools.build:gradle:9.0.0") // Version récente compatible avec 2025
     }
 }
 
@@ -16,6 +16,6 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+tasks.register("clean", Delete::class) {
+    delete(buildDir)
 }
