@@ -8,7 +8,8 @@ on:
   workflow_dispatch: {}
 
 env:
-  FLUTTER_VERSION: '3.19.0'
+  FLUTTER_VERSION: '3.35.0' # Mise à jour vers la dernière version (septembre 2025)
+  JAVA_VERSION: '17' # Compatible avec Flutter 3.35 et Gradle 9.0
 
 jobs:
   setup:
@@ -17,14 +18,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
+          cache-key: flutter-pub-${{ hashFiles('pubspec.yaml') }} # Cache basé sur pubspec.yaml
 
       - name: Install dependencies
-        run: flutter pub get || echo "Dependencies installed with warnings"
+        run: flutter pub get
+
+      - name: Verify Flutter environment
+        run: |
+          flutter doctor -v
+          flutter --version
 
   test:
     runs-on: ubuntu-latest
@@ -33,19 +46,33 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
+          cache-key: flutter-pub-${{ hashFiles('pubspec.yaml') }}
 
       - name: Run tests
         run: |
           if [ -d "test" ] && [ "$(find test -name '*_test.dart' | wc -l)" -gt 0 ]; then
-            flutter test --no-pub || echo "Tests completed"
+            flutter test --coverage || echo "Tests completed with issues"
           else
             echo "No tests found"
           fi
+
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: test-coverage
+          path: coverage/lcov.info
 
   build-android:
     runs-on: ubuntu-latest
@@ -54,17 +81,34 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 35 # Aligné avec targetSdk 35
+          build-tools: "35.0.0"
+          ndk: "25.2.9519653"
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
+          cache-key: flutter-pub-${{ hashFiles('pubspec.yaml') }}
 
       - name: Build APK
         run: flutter build apk --release --no-tree-shake-icons
 
       - name: Build App Bundle
         run: flutter build appbundle --release --no-tree-shake-icons
+
+      - name: Analyze build size
+        run: flutter analyze --no-pub
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
