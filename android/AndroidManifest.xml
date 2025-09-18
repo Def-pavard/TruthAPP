@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.thruthai.truthapp">
+    package="com.example.truth_ai"> <!-- Aligné avec build.gradle.kts -->
 
+    <!-- Permissions existantes -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-<uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions"/>
-    
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions"/>
     <uses-permission android:name="android.permission.INTERNET" />
-    
+
+    <!-- Permissions ajoutées pour les dépendances -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
-        android:label="truthapp"
+        android:label="Truth AI" <!-- Aligné avec le nom de l'application -->
         android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="true">
-        
+        android:usesCleartextTraffic="false"> <!-- Désactivé pour la sécurité -->
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -37,7 +43,7 @@
             android:value="2" />
     </application>
     <service
-    android:name=".AppUsageMonitorService"
-    android:exported="false"
-    android:foregroundServiceType="connectedDevice|dataSync|mediaPlayback"/>
+        android:name=".AppUsageMonitorService"
+        android:exported="false"
+        android:foregroundServiceType="connectedDevice|dataSync|mediaPlayback"/>
 </manifest>
