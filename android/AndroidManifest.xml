@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.truth_ai"> <!-- Aligné avec build.gradle.kts -->
+    package="com.thruthai.truthapp"> <!-- Aligné avec build.gradle.kts -->
 
     <!-- Permissions existantes -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
