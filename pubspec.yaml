@@ -9,32 +9,32 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-    cupertino_icons  : any
-  http: any
-  provider: any
-  image_picker: any
+    cupertino_icons  : ^1.0.8
+  http: ^1.5.0
+  provider: ^6.1.5+1
+  image_picker: ^1.2.0
   flutter_localizations:
     sdk: flutter
-  intl: any
-  font_awesome_flutter: any
-  url_launcher: any
-  google_fonts: any
-  shared_preferences: any
-  flutter_local_notifications: any
-  permission_handler: any
-    device_info_plus  : any
+  intl: ^0.20.2
+  font_awesome_flutter: ^10.10.0
+  url_launcher: ^6.3.2
+  google_fonts: ^6.3.1
+  shared_preferences: ^2.5.3
+  flutter_local_notifications: ^19.4.2
+  permission_handler: ^12.0.1
+    device_info_plus  : ^12.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: any
+  flutter_lints: ^6.0.0
 
 # ⚠️ Overrides seulement si bug rencontré
 dependency_overrides:
-  intl: any
-  material_color_utilities: any
-  meta: any
-  test_api: any
+  intl: ^0.20.2
+  material_color_utilities: ^0.13.0
+  meta: ^1.17.0
+  test_api: ^0.7.7
 
 flutter:
   uses-material-design: true
