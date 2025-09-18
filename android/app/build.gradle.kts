@@ -6,7 +6,7 @@ plugins {
 android {
     compileSdk = 35 // Version récente du SDK (ajustez selon les mises à jour de 2025)
     defaultConfig {
-        applicationId = "com.thruthai.truthApp"
+        applicationId = "com.thruthai.truthapp"
         minSdk = 21
         targetSdk = 35
         versionCode = 1
