@@ -51,24 +51,25 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-        working-directory: TruthAPP/TruthAPP # Hypothèse de sous-répertoire
+        working-directory: TruthAPP
+        # Hypothèse de sous-répertoire
 
       - name: Build APK
         run: flutter build apk --release --no-tree-shake-icons --verbose
-        working-directory: TruthAPP/TruthAPP # Hypothèse de sous-répertoire
+        working-directory: TruthAPP # Hypothèse de sous-répertoire
 
       - name: Build App Bundle
         run: flutter build appbundle --release --no-tree-shake-icons --verbose
-        working-directory: TruthAPP/TruthAPP # Hypothèse de sous-répertoire
+        working-directory: TruthAPP # Hypothèse de sous-répertoire
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: truth-ai-apk
-          path: TruthAPP/TruthAPP/build/app/outputs/flutter-apk/app-release.apk
+          path: TruthAPP/build/app/outputs/flutter-apk/app-release.apk
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: truth-ai-aab
-          path: TruthAPP/TruthAPP/build/app/outputs/bundle/release/app-release.aab
+          path: TruthAPP/build/app/outputs/bundle/release/app-release.aab
