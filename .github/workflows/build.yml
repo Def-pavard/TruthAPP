@@ -38,7 +38,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          api-level: 35
+          api-level: 34
           build-tools: "35.0.0"
           ndk: "25.2.9519653"
 
