@@ -47,20 +47,23 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
-          cache-key: flutter-pub-${{ hashFiles('TruthAPP/**/pubspec.yaml') }} # Recherche récursive
+          cache-key: flutter-pub-${{ hashFiles('TruthAPP/**/pubspec.yaml') }}
 
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get --verbose
         working-directory: TruthAPP
-        # Hypothèse de sous-répertoire
+
+      - name: Debug environment
+        run: flutter doctor -v
+        working-directory: TruthAPP
 
       - name: Build APK
         run: flutter build apk --release --no-tree-shake-icons --verbose
-        working-directory: TruthAPP # Hypothèse de sous-répertoire
+        working-directory: TruthAPP
 
       - name: Build App Bundle
         run: flutter build appbundle --release --no-tree-shake-icons --verbose
-        working-directory: TruthAPP # Hypothèse de sous-répertoire
+        working-directory: TruthAPP
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
