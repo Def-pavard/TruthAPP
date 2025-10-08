@@ -15,7 +15,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
-        android:label="Thruth AI" <!-- Aligné avec le nom de l'application -->
+        android:label="Thruthai" <!-- Aligné avec le nom de l'application -->
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="false"> <!-- Désactivé pour la sécurité -->
 
