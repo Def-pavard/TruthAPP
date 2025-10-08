@@ -76,3 +76,6 @@ jobs:
         with:
           name: truth-ai-aab
           path: TruthAPP/build/app/outputs/bundle/release/app-release.aab
+      - name: List pubspec files
+          run: find . -name "pubspec.yaml"
+          working-directory: TruthAPP
